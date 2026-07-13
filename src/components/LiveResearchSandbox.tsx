@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Terminal, HelpCircle, Check, Loader2, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Play, Terminal, HelpCircle, Check, Loader2, Sparkles, RefreshCw, AlertCircle, Settings, Link, Globe, Info, ExternalLink } from "lucide-react";
 import { ResearchResult } from "../types";
 
 export default function LiveResearchSandbox() {
@@ -10,6 +10,9 @@ export default function LiveResearchSandbox() {
   const [result, setResult] = useState<ResearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [researchMode, setResearchMode] = useState<"live" | "simulated">("simulated");
+  const [selectedEndpointType, setSelectedEndpointType] = useState<"auto" | "pre" | "dev" | "custom">("auto");
+  const [customEndpointValue, setCustomEndpointValue] = useState("");
+  const [showEndpointSettings, setShowEndpointSettings] = useState(false);
   const terminalEndRef = useRef<HTMLDivElement | null>(null);
 
   // Suggested apps to pre-fill
@@ -55,9 +58,21 @@ export default function LiveResearchSandbox() {
     }
 
     try {
-      const apiEndpoint = window.location.hostname.includes("netlify.app")
-        ? "https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research"
-        : "/api/research";
+      let apiEndpoint = "/api/research";
+      if (selectedEndpointType === "pre") {
+        apiEndpoint = "https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research";
+      } else if (selectedEndpointType === "dev") {
+        apiEndpoint = "https://ais-dev-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research";
+      } else if (selectedEndpointType === "custom") {
+        apiEndpoint = customEndpointValue.trim() || "/api/research";
+      } else {
+        // "auto"
+        apiEndpoint = window.location.hostname.includes("netlify.app")
+          ? "https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research"
+          : "/api/research";
+      }
+
+      setLogs((prev) => [...prev, `[Agent] Handshaking with backend API: ${apiEndpoint}...`]);
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -90,8 +105,18 @@ export default function LiveResearchSandbox() {
 
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "An unexpected error occurred during research.");
-      setLogs((prev) => [...prev, `[Error] Research loop terminated abnormally: ${err.message}`]);
+      const errMsg = err.message || "An unexpected error occurred during research.";
+      setError(errMsg);
+      setLogs((prev) => [
+        ...prev, 
+        `[Error] Research loop terminated abnormally: ${errMsg}`,
+        ...(errMsg.toLowerCase().includes("failed to fetch") 
+          ? [
+              `[Help] Connection failure detected! Since you are using a static host (Netlify) or sandboxed frame, your browser might block cross-origin requests.`,
+              `[Help] 👉 Fixes: Click the "API Endpoint Settings" button below to switch backends, or use "Simulated Data" mode above.`
+            ]
+          : [])
+      ]);
     } finally {
       setIsSearching(false);
     }
@@ -147,6 +172,109 @@ export default function LiveResearchSandbox() {
       <p className="text-slate-600 text-sm leading-relaxed">
         Test our research agent live! Select a pre-configured SaaS application or input any arbitrary tech brand below to trigger an active search-grounded research cycle.
       </p>
+
+      {/* Dynamic API Endpoint Settings Config Panel */}
+      <div className="border border-slate-150 bg-slate-50/40 rounded-xl p-3.5 text-xs">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <button
+            onClick={() => setShowEndpointSettings(!showEndpointSettings)}
+            className="flex items-center space-x-1.5 font-bold text-slate-700 hover:text-blue-600 transition-colors cursor-pointer"
+          >
+            <Settings className="w-4 h-4 text-slate-500 transition-transform duration-300 hover:rotate-90" />
+            <span>API Endpoint Settings</span>
+            <span className="text-[10px] text-slate-400 font-normal">
+              ({selectedEndpointType === "auto" ? "Auto-Detect" : selectedEndpointType === "pre" ? "Shared Preview" : selectedEndpointType === "dev" ? "Development Backend" : "Custom Target"})
+            </span>
+          </button>
+          <span className="inline-flex items-center space-x-1 text-[10px] font-mono text-slate-400">
+            <Globe className="w-3.5 h-3.5" />
+            <span>CORS Enabled</span>
+          </span>
+        </div>
+
+        {showEndpointSettings && (
+          <div className="mt-3.5 pt-3 border-t border-slate-200/60 space-y-3 animate-fadeIn">
+            <p className="text-[10px] text-slate-500 leading-normal">
+              Configure which backend serves the Live API research requests. If you face CORS or network errors when running on Netlify, try switching to another backend or configure a custom endpoint.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                onClick={() => setSelectedEndpointType("auto")}
+                className={`p-2 border rounded-xl text-center text-xs transition-all cursor-pointer ${
+                  selectedEndpointType === "auto"
+                    ? "bg-blue-50 border-blue-200 text-blue-700 font-semibold"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Auto Detect
+              </button>
+              <button
+                onClick={() => setSelectedEndpointType("pre")}
+                className={`p-2 border rounded-xl text-center text-xs transition-all cursor-pointer ${
+                  selectedEndpointType === "pre"
+                    ? "bg-blue-50 border-blue-200 text-blue-700 font-semibold"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Shared (PRE)
+              </button>
+              <button
+                onClick={() => setSelectedEndpointType("dev")}
+                className={`p-2 border rounded-xl text-center text-xs transition-all cursor-pointer ${
+                  selectedEndpointType === "dev"
+                    ? "bg-blue-50 border-blue-200 text-blue-700 font-semibold"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Development (DEV)
+              </button>
+              <button
+                onClick={() => setSelectedEndpointType("custom")}
+                className={`p-2 border rounded-xl text-center text-xs transition-all cursor-pointer ${
+                  selectedEndpointType === "custom"
+                    ? "bg-blue-50 border-blue-200 text-blue-700 font-semibold"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Custom URL
+              </button>
+            </div>
+
+            {selectedEndpointType === "custom" && (
+              <div className="space-y-1.5 animate-fadeIn">
+                <label className="block text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">
+                  Custom Target API URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customEndpointValue}
+                    onChange={(e) => setCustomEndpointValue(e.target.value)}
+                    placeholder="e.g. http://localhost:3000/api/research"
+                    className="flex-1 px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs focus:outline-none focus:border-blue-500 font-mono"
+                  />
+                  <button
+                    onClick={() => setCustomEndpointValue("https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research")}
+                    className="px-2.5 py-1.5 border border-slate-200 hover:bg-slate-100 text-slate-500 hover:text-slate-700 text-xs rounded-lg transition-colors cursor-pointer shrink-0 font-mono"
+                    title="Reset to production shared preview URL"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-blue-50/50 p-2.5 rounded-lg text-[10px] text-blue-800 border border-blue-100/60 flex gap-2 items-start">
+              <Info className="w-4 h-4 shrink-0 text-blue-500 mt-0.5" />
+              <div>
+                <span className="font-semibold block">CORS Headers Active:</span>
+                The backend server (Express on Cloud Run) is pre-configured with fully permissive CORS origins (`Access-Control-Allow-Origin: *`) to ensure error-free requests from Netlify.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Suggested Quick Picks */}
       <div className="flex flex-wrap items-center gap-2">
