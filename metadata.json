@@ -1,0 +1,6 @@
+{
+  "name": "Composio Toolkit Parity Research",
+  "description": "An interactive executive dashboard and autonomous search-grounded research agent researching developer credentials and API buildability of 100 SaaS applications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
