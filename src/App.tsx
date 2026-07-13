@@ -41,9 +41,9 @@ export default function App() {
               <div className="w-4 h-4 border-2 border-white rotate-45"></div>
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-800">AI Product Ops: Toolkit Parity Case Study</h1>
+              <h1 className="text-xl font-bold tracking-tight text-slate-800">AI Product Ops</h1>
               <p className="text-[10px] md:text-xs text-slate-400 font-mono">
-                100 SaaS Apps • 10 Categories • Hand-Verified Research
+                Toolkit Parity Case Study • 100 SaaS Apps • Hand-Verified Research
               </p>
             </div>
           </div>
