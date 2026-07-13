@@ -56,7 +56,7 @@ export default function App() {
               </span>
             </div>
             <a
-              href="https://github.com/madhum161616/composio-toolkit-parity"
+              href="https://github.com/madhum161616/AI-Proudct-Ops"
               target="_blank"
               referrerPolicy="no-referrer"
               className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold inline-flex items-center space-x-1.5 transition-colors border border-slate-200"
