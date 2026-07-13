@@ -55,7 +55,11 @@ export default function LiveResearchSandbox() {
     }
 
     try {
-      const response = await fetch("/api/research", {
+      const apiEndpoint = window.location.hostname.includes("netlify.app")
+        ? "https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app/api/research"
+        : "/api/research";
+
+      const response = await fetch(apiEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appName, website, mode: researchMode })
