@@ -163,12 +163,47 @@ export default function AppsTable({ apps, activeFilter, setFilter }: AppsTablePr
         </div>
       </div>
 
+      {/* Active Sync Filter Indicator Banner */}
+      {(activeFilter.auth || activeFilter.status || activeFilter.verdict) && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl gap-3 animate-fadeIn">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-blue-800">
+            <span className="font-semibold text-blue-900">Active Sync Filter:</span>
+            {activeFilter.auth && (
+              <span className="bg-white border border-blue-200 px-2.5 py-0.5 rounded-full font-semibold font-mono text-[10px] text-blue-700 shadow-sm">
+                Auth: {activeFilter.auth}
+              </span>
+            )}
+            {activeFilter.status && (
+              <span className="bg-white border border-blue-200 px-2.5 py-0.5 rounded-full font-semibold font-mono text-[10px] text-blue-700 shadow-sm">
+                Access: {activeFilter.status}
+              </span>
+            )}
+            {activeFilter.verdict && (
+              <span className="bg-white border border-blue-200 px-2.5 py-0.5 rounded-full font-semibold font-mono text-[10px] text-blue-700 shadow-sm">
+                Verdict: {activeFilter.verdict}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => setFilter({})}
+            className="text-xs text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer hover:no-underline transition-colors shrink-0"
+          >
+            Clear active filters & show all 100 apps
+          </button>
+        </div>
+      )}
+
       {/* Categories Horizontal Tabs scrollable */}
       <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-none border-b border-slate-100">
         {categories.map((cat) => (
           <button
             key={cat}
-            onClick={() => setSelectedCategory(cat)}
+            onClick={() => {
+              setSelectedCategory(cat);
+              if (cat === "All") {
+                setFilter({});
+              }
+            }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === cat
                 ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
