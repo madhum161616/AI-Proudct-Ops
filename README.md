@@ -5,8 +5,8 @@ This repository contains an interactive **Technical Research & Verification Port
 The system operates both in a fully offline high-fidelity **Heuristic Simulation Mode** and a live **GenAI Web Research Agent Mode** using Google Gemini, showcasing automated validation alongside honest human-in-the-loop audit logs.
 
 ## 🔗 Live Application Links
-- **Interactive Portal (Development):** [https://ais-dev-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app](https://ais-dev-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app)
-- **Interactive Portal (Production):** [https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app](https://ais-pre-yjny4v373i5u53pgb45ljo-266029530866.asia-southeast1.run.app)
+
+- **Interactive Portal (Production):** https://ai-proudct-ops.netlify.app/
 
 ---
 
